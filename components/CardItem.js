@@ -2,10 +2,21 @@ import React from "react";
 import {
   ChatAlt2Icon,
   PaperClipIcon,
+  XCircleIcon,
+  ShareIcon
 } from "@heroicons/react/outline";
 import { Draggable } from "react-beautiful-dnd";
 
 function CardItem({ data, index }) {
+  const ticketUrl = "http://localhost:3000/";
+  
+// Function to copy ticket link 
+  function handleShare (value){
+    {navigator.clipboard.writeText(
+      `${ticketUrl}${value}`
+    )}
+    alert('Link copied to clipboard')
+  }
   return (
     <Draggable index={index} draggableId={data.id.toString()}>
       {(provided) => (
@@ -45,6 +56,11 @@ function CardItem({ data, index }) {
               <span className="flex space-x-1 items-center">
                 <PaperClipIcon className="w-4 h-4 text-gray-500" />
                 <span>{data.attachment}</span>
+              </span>
+              <span className="flex space-x-1 items-center cursor-pointer font-medium text-sm">
+                <span onClick={()=>handleShare(data.id)} title="share link">
+                    <ShareIcon className="w-4 h-4 " />
+                  </span>
               </span>
             </div>
 

@@ -1,0 +1,59 @@
+{
+  "boards": [
+    {
+      "name": "Task  to do",
+      "default": 1,
+      "items": [
+        {
+          "id": "1e74d0aa-ee17-4787-bf4b-ef5220791ec9",
+          "title": "Design ",
+          "priority": 0,
+          "chat": 0,
+          "attachment": 0
+        },
+        {
+          "id": "0a301329-2847-4a23-a213-53defc4e2e9b",
+          "title": "Mobile app login process prototype",
+          "priority": 0,
+          "chat": 0,
+          "attachment": 0
+        }
+      ],
+      "id": 1
+    },
+    {
+      "id": 2,
+      "name": "In Progress",
+      "items": [],
+      "default": 0
+    },
+    {
+      "id": 3,
+      "name": "In Review",
+      "items": [],
+      "default": 0
+    },
+    {
+      "id": 4,
+      "name": "Completed",
+      "items": [],
+      "default": 0
+    }
+  ],
+  "tickets": [
+    {
+      "id": "1e74d0aa-ee17-4787-bf4b-ef5220791ec9",
+      "title": "Design ",
+      "priority": 0,
+      "chat": 0,
+      "attachment": 0
+    },
+    {
+      "id": "0a301329-2847-4a23-a213-53defc4e2e9b",
+      "title": "Mobile app login process prototype",
+      "priority": 0,
+      "chat": 0,
+      "attachment": 0
+    }
+  ]
+}

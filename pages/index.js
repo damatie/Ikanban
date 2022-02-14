@@ -1,33 +1,38 @@
 import Layout from "../components/Layout";
+import { getBoards,createTicketList,createTicket } from "../services/apiFactory";
 import {
-  ChevronDownIcon,
-  PlusIcon,
   DotsVerticalIcon,
   PlusCircleIcon,
 } from "@heroicons/react/outline";
 import CardItem from "../components/CardItem";
-import BoardData from "../data/board-data.json";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useEffect, useState } from "react";
 
+// Function to genrate random unique id for new ticket
 function createGuidId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    console.log(v.toString(16))
     return v.toString(16);
   });
 }
 
 export default function Home() {
   const [ready, setReady] = useState(false);
-  const [boardData, setBoardData] = useState(BoardData);
+  const [boardData, setBoardData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedBoard, setSelectedBoard] = useState(0);
 
+  // Get data on page load
   useEffect(() => {
+      getBoards().then(res => {
+        const result = res.data
+       
+        setBoardData(result)
+      })
       setReady(true);
   }, []);
 
+  // Function to handle onDragEnd
   const onDragEnd = (re) => {
     if (!re.destination) return;
     let newBoardData = boardData;
@@ -45,6 +50,7 @@ export default function Home() {
     setBoardData(newBoardData);
   };
 
+// Function to handle form submited
   const onTextAreaKeyPress = (e) => {
     if(e.keyCode === 13) //Enter
     {
@@ -53,7 +59,8 @@ export default function Home() {
         setShowForm(false);
       }
       else {
-        const boardId = e.target.attributes['data-id'].value;
+        let boardId = e.target.attributes['data-id'].value;
+        // Get data from form input
         const item = {
           id: createGuidId(),
           title: val,
@@ -61,18 +68,39 @@ export default function Home() {
           chat:0,
           attachment: 0,
         }
+        
         let newBoardData = boardData;
         newBoardData[boardId].items.push(item);
-        setBoardData(newBoardData);
+        setBoardData(boardData);
+        const outCome = boardData.filter((data, index) => index === parseInt(boardId))
+         const newOutcome = outCome[parseInt(boardId)].items.map((itemList) =>{
+           const resultData = itemList
+         return  resultData
+        }
+        )
+
+        // Get data from item and set in to the Item data
+        const itemData = {
+          name: "Task  to do",
+          "default": 1,
+          items:newOutcome
+        }  
+        createTicket(itemData)
+        createTicketList(item)
         setShowForm(false);
         e.target.value = '';
       }
     }
   }
 
+  //Function to close textarea
+  const handleCancle = ()=>{
+    setShowForm(false)
+  }
+
   return (
     <Layout>
-      <div className="p-10 flex flex-col h-screen">
+      <div className=" p-3 xl:p-10 flex flex-col h-screen">
         {/* Board header */}
         <div className="flex flex-initial justify-between">
           <div className="flex items-center">
@@ -83,8 +111,9 @@ export default function Home() {
         {/* Board columns */}
         {ready && (
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid grid-cols-4 gap-5 my-5">
-              {boardData.map((board, bIndex) => {
+            <div className=" w-full  overflow-x-auto overflow-y-hidden">
+              <div className=" w-full min-w-max grid grid-cols-4 gap-5 my-5">
+              {boardData && boardData.map((board, bIndex) => {
                 return (
                   <div key={board.name}>
                     <Droppable droppableId={bIndex.toString()}>
@@ -94,7 +123,7 @@ export default function Home() {
                           ref={provided.innerRef}
                         >
                           <div
-                            className={`bg-gray-100 rounded-md shadow-md
+                            className={` pb-6 bg-gray-100 rounded-md shadow-md
                             flex flex-col relative overflow-hidden
                             ${snapshot.isDraggingOver && "bg-blue-100"}`}
                           >
@@ -104,11 +133,11 @@ export default function Home() {
                             ></span>
                             <h4 className=" p-3 flex justify-between items-center mb-2">
                               <span className="text-xl text-gray-600 font-semibold">
-                                {board.name}
+                                {board.name} 
                               </span>
                               <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
                             </h4>
-
+                             
                             <div className="overflow-y-auto overflow-x-hidden h-auto"
                             style={{maxHeight:'calc(100vh - 290px)'}}>
                               {board.items.length > 0 &&
@@ -124,18 +153,22 @@ export default function Home() {
                                 })}
                               {provided.placeholder}
                             </div>
-                            
+                            { board.default === 1?<div className=" flex justify-center text-center">
                             {
                               showForm && selectedBoard === bIndex ? (
-                                <div className="p-3">
+                                <div className="p-3 w-full">
                                   <textarea className="border-gray-300 rounded focus:ring-purple-400 w-full" 
                                   rows={3} placeholder="Task info then press enter" 
                                   data-id={bIndex}
-                                  onKeyDown={(e) => onTextAreaKeyPress(e)}/>
+                                  onKeyDown={(e) => onTextAreaKeyPress(e,)}
+                                  />
+                                  <span>
+                                    <button onClick={ handleCancle}>Cancel</button>
+                                  </span>
                                 </div>
                               ): (
                                 <button
-                                  className="flex justify-center items-center my-3 space-x-2 text-lg"
+                                  className="flex justify-center items-center mt-4 space-x-2 text-lg"
                                   onClick={() => {setSelectedBoard(bIndex); setShowForm(true);}}
                                 >
                                   <span>Add task</span>
@@ -143,6 +176,7 @@ export default function Home() {
                                 </button>
                               )
                             }
+                            </div> : ''}
                           </div>
                         </div>
                       )}
@@ -150,6 +184,7 @@ export default function Home() {
                   </div>
                 );
               })}
+              </div>
             </div>
           </DragDropContext>
         )}
